@@ -3,19 +3,6 @@ open Graph
 type path = id list
 
 
-
-(********************************************************************************)
-(************* PRIVATE FUNCTIONS, DO NOT USE OUTSIDE OF THIS PACKAGE ************)
-(********************************************************************************)
-
-(* finds a path between two nodes, without the first node *)
-val step_path: int graph -> id list -> id -> id -> path option
-
-(* finds a path and the associated max flow to add between two nodes, without the first node and it's flow *)
-val step_path_and_flow: int graph -> id list -> id -> id -> (path * int) option
-
-
-
 (********************************************************************************)
 (*************************** INTERMEDIATE FUNCTIONS *****************************)
 (********************************************************************************)

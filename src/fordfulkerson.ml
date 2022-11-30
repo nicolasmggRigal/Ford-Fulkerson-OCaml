@@ -80,14 +80,6 @@ let init_residual_graph gr =
   let gr2 = gr1 in
   e_fold gr1 tmp gr2
 
-(* version de secours si il y a un jour un probleme avec l'autre version
-let init_residual gr =
-  let gr1 = graph_int_of_string gr in
-  let tmp gr id1 id2 pd = add_arc ( add_arc gr id1 id2 pd ) id2 id1 0 in
-  let gr2 = clone_nodes gr1 in
-  e_fold gr1 tmp gr2
-  *)
-
 
 (* gives the flow graph when given a residual graph and it's initial capacity graph *)
 let get_flow_graph flow_gr base_gr =
@@ -96,7 +88,7 @@ let get_flow_graph flow_gr base_gr =
     match find_arc flow_gr id1 id2 with
       | None -> gr
       | Some s ->
-        let value = string_of_int (int_of_string pd - s) in
+        let value = string_of_int (max 0 (int_of_string pd - s)) in
         new_arc gr id1 id2 (value ^ "/" ^ pd)
   in
   e_fold base_gr beautifulise new_gr
