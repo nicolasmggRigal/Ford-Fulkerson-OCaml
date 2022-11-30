@@ -17,7 +17,7 @@ demo: build
 	@cat outfile
 	@echo ""
 	@dot -Tsvg graph.gv > outgraph.svg
-	@gwenview outgraph.svg&
+	@eom outgraph.svg&
 
 clean:
 	-rm -rf _build/
