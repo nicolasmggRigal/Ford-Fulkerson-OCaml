@@ -1,0 +1,7 @@
+/_build/
+/.vscode/
+/graphs/
+/ftest.native
+/outfile
+/outgraph.svg
+/ocamlformat
