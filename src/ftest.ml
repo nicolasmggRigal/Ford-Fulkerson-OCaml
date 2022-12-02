@@ -26,6 +26,8 @@ let () =
   (* Open file *)
   let graph = get_exchange_graph infile in
 
+  let graph = ford_fulkerson graph 0 1 in
+
 (***** Modifications graphe *****)
 
 (********************************)

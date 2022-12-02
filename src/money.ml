@@ -1,4 +1,5 @@
 open Graph
+open Tools
 
 type path = string
 
@@ -23,7 +24,7 @@ let get_amounts path =
       with End_of_file -> list (* Done *)
     in
 
-    let amounts = loop 2 [] in
+    let amounts = loop 1 [] in
 
     close_in infile;
     amounts
@@ -52,19 +53,29 @@ let init_nodes path =
   in
   let initial_graph = new_node (new_node empty_graph 0) 1 in
 
+  let res = loop 2 initial_graph in
   close_in infile ;
-  loop 2 initial_graph
+  res
 
 
 let init_arcs graph total amounts =
   let moy = total / List.length amounts in
-  let due = List.map ( fun (n, x) -> (n, x-moy) ) amounts in
+  let due = List.map ( fun (n, x) -> Printf.printf "noeud : %d, du : %d\n" n (x-moy) ; (n, x-moy) ) amounts in
+  (* boucle pour lier les noeuds aux puits/source *)
   let rec loop gr = function
-    | [] | (n, 0) -> graph
-    | (n, x) :: tail -> if x < 0 then loop (add_arc gr 0 n (-x)) tail else loop (add_arc gr n 1 x) tail
+    | [] -> gr
+    | (_, 0) :: tail -> loop gr tail
+    | (n, x) :: tail -> if x < 0 then loop (new_arc gr 0 n (-x)) tail else loop (new_arc gr n 1 x) tail
   in
-  loop graph due
-(* TODO VERIFIER ^^ *)
+  (* boucle pour lier les noeuds entre eux *)
+  n_fold graph (
+    fun gr1 id1 -> if id1 <> 0 && id1 <> 1 then
+      n_fold graph (
+        fun gr2 id2 -> if id2 <> 0 && id2 <> 1 && id2 <> id1 then new_arc gr2 id1 id2 total else gr2
+        ) gr1
+    else
+      gr1
+  ) (loop graph due)
  
 let get_exchange_graph path =
 
@@ -76,11 +87,12 @@ let get_exchange_graph path =
     in
     let total = loop 0 amounts in
     Printf.printf "\nTotal = %d\n" total ;
+    Printf.printf "Path = %s\n" path ;
     total
   in
 
   let initial_graph = init_nodes path in
   let total = total_money in
-  let final_graph = init_arcs initial_graph total amounts in
+  let final_graph = graph_string_of_int (init_arcs initial_graph total amounts) in
 
   final_graph
