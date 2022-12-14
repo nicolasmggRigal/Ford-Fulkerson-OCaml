@@ -1,5 +1,6 @@
 open Graph
 open Tools
+open Fordfulkerson
 
 type path = string
 
@@ -59,8 +60,12 @@ let init_nodes path =
 
 
 let init_arcs graph total amounts =
-  let moy = total / List.length amounts in
-  let due = List.map ( fun (n, x) -> Printf.printf "noeud : %d, du : %d\n" n (x-moy) ; (n, x-moy) ) amounts in
+  (* On doit tout multiplier par le nombre de participants pour travailler avec des int *)
+  let buffed_amounts = List.map (fun (n, x) -> (n, (List.length amounts) * x) ) amounts
+  and buffed_total = total * (List.length amounts) in
+
+  let moy = buffed_total / List.length buffed_amounts in
+  let due = List.map ( fun (n, x) -> Printf.printf "noeud : %d, du : %d\n" n (x-moy) ; (n, x-moy) ) buffed_amounts in
   (* boucle pour lier les noeuds aux puits/source *)
   let rec loop gr = function
     | [] -> gr
@@ -71,7 +76,7 @@ let init_arcs graph total amounts =
   n_fold graph (
     fun gr1 id1 -> if id1 <> 0 && id1 <> 1 then
       n_fold graph (
-        fun gr2 id2 -> if id2 <> 0 && id2 <> 1 && id2 <> id1 then new_arc gr2 id1 id2 total else gr2
+        fun gr2 id2 -> if id2 <> 0 && id2 <> 1 && id2 <> id1 then new_arc gr2 id1 id2 buffed_total else gr2
         ) gr1
     else
       gr1
@@ -93,6 +98,10 @@ let get_exchange_graph path =
 
   let initial_graph = init_nodes path in
   let total = total_money in
-  let final_graph = graph_string_of_int (init_arcs initial_graph total amounts) in
+
+  (* On doit revenir aux valeurs initiales *)
+  let step_graph = float_ford_fulkerson (graph_string_of_int (init_arcs initial_graph total amounts)) 0 1 (List.length amounts) in
+
+  let final_graph = step_graph in
 
   final_graph

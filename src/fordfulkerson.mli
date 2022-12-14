@@ -26,3 +26,5 @@ val ff_iterate: int graph -> id -> id -> int graph
 
 (* gives the associated max flow graph when given a capity graph *)
 val ford_fulkerson: string graph -> id -> id -> string graph
+
+val float_ford_fulkerson: string graph -> id -> id -> int -> string graph
