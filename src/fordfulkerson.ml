@@ -99,9 +99,25 @@ let rec ff_iterate gr start finish = match find_path_and_flow gr start finish wi
   | None -> gr
   | Some res -> ff_iterate (add_flow_to_path gr res) start finish 
 
-
-
 let ford_fulkerson graph start finish =
   let residual_graph = init_residual_graph graph in
   let graphe_resultat = ff_iterate residual_graph start finish in
   get_flow_graph graphe_resultat graph
+
+
+(* gives the flow graph when given a residual graph and it's initial capacity graph *)
+let float_get_graph flow_gr base_gr n =
+  let new_gr = clone_nodes flow_gr in
+  let beautifulise gr id1 id2 pd =
+    match find_arc flow_gr id1 id2 with
+      | None -> gr
+      | Some s ->
+        let value = string_of_float (float_of_int (max 0 (int_of_string pd - s)) /. (float_of_int n)) in
+        if value <> "0." then new_arc gr id1 id2 value else gr
+  in
+  e_fold base_gr beautifulise new_gr
+
+let float_ford_fulkerson graph start finish n =
+  let residual_graph = init_residual_graph graph in
+  let graphe_resultat = ff_iterate residual_graph start finish in
+  float_get_graph graphe_resultat graph n

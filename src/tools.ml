@@ -17,4 +17,6 @@ let add_arc gr id1 id2 pd =
 
 let graph_string_of_int gr = gmap gr (fun pd -> string_of_int pd)
 
+let graph_string_of_float gr = gmap gr (fun pd -> string_of_float pd)
+
 let graph_int_of_string gr = gmap gr (fun pd -> int_of_string pd)
