@@ -1,14 +1,6 @@
 digraph outgraph {
-		fontname="Helvetica,Arial,sans-serif"
-		node [fontname="Helvetica,Arial,sans-serif"]
-		edge [fontname="Helvetica,Arial,sans-serif"]
-		rankdir=LR;
-		node [shape = circle]; 0 1 2 3 4 5
-	2 -> 5 [label = "0.25"];
-	3 -> 5 [label = "2.25"];
-	4 -> 5 [label = "17.25"];
-	5 -> 1 [label = "19.75"];
-	0 -> 2 [label = "0.25"];
-	0 -> 3 [label = "2.25"];
-	0 -> 4 [label = "17.25"];
-}
+  	fontname="Helvetica,Arial,sans-serif"
+  	node [fontname="Helvetica,Arial,sans-serif"]
+  	edge [fontname="Helvetica,Arial,sans-serif"]
+  	rankdir=LR;
+  	node [shape = circle]; 2 3 4 5 6 7

@@ -1,6 +1,7 @@
 open Graph
 open Tools
 open Fordfulkerson
+open Printf
 
 type path = string
 
@@ -102,6 +103,46 @@ let get_exchange_graph path =
   (* On doit revenir aux valeurs initiales *)
   let step_graph = float_ford_fulkerson (graph_string_of_int (init_arcs initial_graph total amounts)) 0 1 (List.length amounts) in
 
-  let final_graph = step_graph in
+  let final_graph = e_fold step_graph (fun gr id1 id2 pd -> if id1 = 0 || id1 = 1 || id2 = 0 || id2 = 1 then gr else new_arc gr id1 id2 pd) (n_fold step_graph (fun gr id -> if id = 0 || id = 1 then gr else new_node gr id) empty_graph) in
 
-  final_graph
+  final_graph  
+
+let get_names path = 
+  let infile = open_in path in
+  let rec loop names =
+    try
+      let line = input_line infile in
+
+      (* Remove leading and trailing spaces. *)
+      let line = String.trim line in
+      
+      (* Ignore empty and comment lines *)
+      if (line = "") || (line.[0] = '#') then loop names
+      else Scanf.sscanf line "%s %d" (fun name _ -> printf "%s" name; name :: names) ; loop names
+
+    with End_of_file -> names (* Done *)
+  in
+  loop [] 
+
+let export_money gr path =
+  (* Open a write-file. *)
+  let ff = open_out "graph.gv" in
+  let names = get_names path in
+
+  (* Write in this file. *)
+  fprintf ff "digraph outgraph {
+  \tfontname=\"Helvetica,Arial,sans-serif\"
+  \tnode [fontname=\"Helvetica,Arial,sans-serif\"]
+  \tedge [fontname=\"Helvetica,Arial,sans-serif\"]
+  \trankdir=LR;
+  \tnode [shape = circle];" ;
+
+  n_iter_sorted gr (fun id -> fprintf ff " %d" id) ;
+
+  (* Write all arcs *)
+  e_iter gr (fun id1 id2 lbl -> fprintf ff "\n\t%s -> %s [label = \"%s\"];" (List.nth names id1) (List.nth names id2) lbl) ;
+
+  fprintf ff "\n}\n" ;
+
+  close_out ff ;
+  ()

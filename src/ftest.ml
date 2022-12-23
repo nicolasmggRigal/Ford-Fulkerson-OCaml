@@ -32,8 +32,7 @@ let () =
 
   (* let graph = ford_fulkerson graph _source _sink in *)
   (* Rewrite the graph that has been read. *)
-  let () = export graph ; write_file outfile graph in
-
+  let () = export_money graph infile ; write_file outfile graph in
   
   ()
 
