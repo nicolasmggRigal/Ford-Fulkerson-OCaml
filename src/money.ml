@@ -118,9 +118,11 @@ let get_names path =
       
       (* Ignore empty and comment lines *)
       if (line = "") || (line.[0] = '#') then loop names
-      else Scanf.sscanf line "%s %d" (fun name _ -> printf "%s" name; name :: names) ; loop names
+      else 
+        let name = Scanf.sscanf line "%s %d" (fun name _ -> printf "%s\n" name ; name) in
+        loop (name :: names)
 
-    with End_of_file -> names (* Done *)
+    with End_of_file -> List.rev names (* Done *)
   in
   loop [] 
 
@@ -137,10 +139,10 @@ let export_money gr path =
   \trankdir=LR;
   \tnode [shape = circle];" ;
 
-  n_iter_sorted gr (fun id -> fprintf ff " %d" id) ;
+  n_iter_sorted gr (fun id -> fprintf ff " %s" (List.nth names (id - 2))) ;
 
   (* Write all arcs *)
-  e_iter gr (fun id1 id2 lbl -> fprintf ff "\n\t%s -> %s [label = \"%s\"];" (List.nth names id1) (List.nth names id2) lbl) ;
+  e_iter gr (fun id1 id2 lbl -> printf "%d %d\n" id1 id2 ; fprintf ff "\n\t%s -> %s [label = \"%s\"];" (List.nth names (id1 - 2)) (List.nth names (id2 - 2)) lbl) ;
 
   fprintf ff "\n}\n" ;
 
