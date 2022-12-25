@@ -23,18 +23,18 @@ let create_graph gr =
 (* Ca me soule, bonne chance Nico *)
 let rec step_path_and_flow gr visited id1 id2 =
   let succ = out_arcs gr id1 in
-  let rec loop acu paths max_flow pathsize = function
-    | [] -> None
-    | (_, (0, _)) :: tail -> loop acu paths max_flow pathsize tail
+  let rec loop acu path max_flow pathsize = function
+    | [] -> path
+    | (_, (0, _)) :: tail -> loop acu path max_flow pathsize tail
     | (head, (flow, cost)) :: tail when head = id2 -> Some ((id2 :: acu), min max_flow flow, pathsize + cost)
-    | (head, (flow, cost)) :: tail when List.mem head visited -> loop acu paths max_flow pathsize tail
+    | (head, (flow, cost)) :: tail when List.mem head visited -> loop acu path max_flow pathsize tail
     | (head, (flow, cost)) :: tail -> (
       match step_path_and_flow gr (head :: visited) head id2 with
         | None -> loop paths acu max_flow pathsize tail
-        | Some (chemin, f, c) -> loop (Some ((head :: chemin), min flow f, cost + c) :: paths) max
+        | Some (chemin, f, c) -> if (cost + c) < fraise then Some ((head :: chemin), min flow f, cost + c) else Some path
     )
   in
-  loop [] [] max_int max_int succ
+  loop [] None max_int max_int succ
 
 (* finds a path and the associated max flow to add between two nodes *)
 let find_path_and_flow gr id1 id2 =
