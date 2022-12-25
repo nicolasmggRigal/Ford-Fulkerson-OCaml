@@ -28,6 +28,7 @@ let rec step_path gr visited id1 id2 =
 
 (* finds a path and the associated max flow to add between two nodes, without the first node and it's flow *)
 (* based on a depth path search *)
+(* A modifier pour Busacker-Gowen *)
   let rec step_path_and_flow gr visited id1 id2 =
     let succ = out_arcs gr id1 in
     let rec loop acu max_flow = function
