@@ -2,7 +2,7 @@ open Gfile
 open Tools
 open Fordfulkerson
 open Graph
-open Money
+open Busackergowen
     
 let () =
 
@@ -24,7 +24,8 @@ let () =
   in
 
   (* Open file *)
-  let graph = get_exchange_graph infile in
+  let graph = from_file infile in
+  let graphe = create_graph graph in
 
 (***** Modifications graphe *****)
 
@@ -32,7 +33,7 @@ let () =
 
   (* let graph = ford_fulkerson graph _source _sink in *)
   (* Rewrite the graph that has been read. *)
-  let () = export_money graph infile ; write_file outfile graph in
+  let () = export graph ; write_file outfile graph in
   
   ()
 

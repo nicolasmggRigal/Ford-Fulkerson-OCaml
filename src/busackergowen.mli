@@ -2,12 +2,14 @@ open Graph
 
 type path = id list
 
+val create_graph: string graph -> (int*int) graph
+
 (********************************************************************************)
 (*************************** INTERMEDIATE FUNCTIONS *****************************)
 (********************************************************************************)
 
 (* finds a path and the associated max flow to add between two nodes *)
-val find_path_and_flow: int graph -> id -> id -> (path * int) option
+val find_path_and_flow: (int * int) graph -> id -> id -> (path * int * int) option
 
 (* adds the given flow to every arc along the given path *)
 val add_flow_to_path: int graph -> (path * int) -> int graph

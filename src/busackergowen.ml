@@ -1,6 +1,8 @@
 open Graph
 open Tools
 
+type path = id list
+
 (*Concept : 
 FordFulkerson mais en plus il y a des coûts pour chaque arc...
 
@@ -13,31 +15,48 @@ Graph de début :
 (* string graph -> (flow x cost) graph *)
 let create_graph gr = 
   let empty = clone_nodes gr in
-  e_fold gr (fun newgr id1 id2 pd -> new_arc newgr id1 id2 (Scanf.sscanf "%d (%d)" (fun flow cost -> (flow, cost)))) empty
+  e_fold gr (fun newgr id1 id2 label -> new_arc newgr id1 id2 (Scanf.sscanf label "%d (%d)" (fun flow cost -> (flow, cost)))) empty
 
 (* finds a path and the associated max flow to add between two nodes, without the first node and it's flow *)
 (* based on a depth path search *)
 (* A modifier pour Busacker-Gowen *)
+(* Ca me soule, bonne chance Nico *)
 let rec step_path_and_flow gr visited id1 id2 =
   let succ = out_arcs gr id1 in
-  let rec loop acu max_flow pathsize = function
+  let rec loop acu paths max_flow pathsize = function
     | [] -> None
-    | (_, 0) :: tail -> loop acu max_flow tail
+    | (_, (0, _)) :: tail -> loop acu paths max_flow pathsize tail
     | (head, (flow, cost)) :: tail when head = id2 -> Some ((id2 :: acu), min max_flow flow, pathsize + cost)
-    | (head, (flow, cost)) :: tail when List.mem head visited -> loop acu max_flow pathsize tail
+    | (head, (flow, cost)) :: tail when List.mem head visited -> loop acu paths max_flow pathsize tail
     | (head, (flow, cost)) :: tail -> (
       match step_path_and_flow gr (head :: visited) head id2 with
-        | None -> loop acu max_flow tail
-        | Some (chemin, f, c) -> Some ((head :: chemin), min flow f, cost + c)
+        | None -> loop paths acu max_flow pathsize tail
+        | Some (chemin, f, c) -> loop (Some ((head :: chemin), min flow f, cost + c) :: paths) max
     )
   in
-  loop [] max_int succ
+  loop [] [] max_int max_int succ
 
 (* finds a path and the associated max flow to add between two nodes *)
-let find_path_and_flow gr id1 id2 = assert false
+let find_path_and_flow gr id1 id2 =
+  let get_first = function
+    | e :: _ -> e
+    | _ -> 0 (* inutile car toujours utilise avec au moins 1 element mais besoin pour pattern matching *)
+  in
+  match step_path_and_flow gr [] id1 id2 with
+    | Some (p, max_flow, min_cost) -> (
+      match find_arc gr id1 (get_first p) with
+        | Some (flow, cost) -> Some (id1 :: p, min max_flow flow, min_cost + cost)
+        | None -> Some (id1 :: p, max_flow, min_cost) (* inutile puisque l'arc existera toujours mais besoin pour pattern matching *)
+    )
+    | None -> None
 
 (* adds the given flow to every arc along the given path *)
-let add_flow_to_path gr (path, flow) = assert false
+(* A changer totalement *)
+let rec add_flow_to_path gr (path, flow) =
+  match path with
+    | [] -> gr
+    | _ :: [] -> gr
+    | id1 :: id2 :: tail -> add_flow_to_path (add_arc (add_arc gr id1 id2 (-flow)) id2 id1 flow) ((id2 :: tail), flow)
 
 (* gives the corresponding residual graph when given the initial capacity graph *)
 let init_residual_graph gr = assert false
@@ -49,4 +68,4 @@ let get_flow_graph flow_gr base_gr = assert false
 let ff_iterate gr start finish = assert false
 
 (* gives the associated max flow graph when given a capity graph *)
-let ford_fulkerson graph start finish = assert false
+let busacker_gowen graph start finish = assert false
